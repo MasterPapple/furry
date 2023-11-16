@@ -29,7 +29,7 @@ class Hero:
 
     def action_damage(self, furry):
         furry.health -= self.strength #- self.weapon.strength
-        print(f"You attacked the furry {furry.name} for {self.strength}")
+        print(f"You attacked the furry {furry.name} for {self.strength} \nNow they have {furry.health} health")
         if furry.health <= 0:
             print("What a skilled hero, you are. You killed a furry.")
             furry.die()
@@ -55,7 +55,10 @@ class Furry:
 
     def attack(self, hero):
         hero.health = (hero.health[0] - self.damage, hero.health[1])
-        print(f"Furry {self.name} attacked you for {self.damage}")
+        if hero.health[0] <= 0:
+            print("FUCK!! A furry just killed you!")
+            quit()
+        print(f"Furry {self.name} attacked you for {self.damage} \nAnd you have {hero.health[0]} left")
 
     def die(self):
         global enemy
@@ -107,8 +110,11 @@ class EventHandler:
 
 def spawn_furry():
     global enemy
-    enemy = Furry("Jojo")
-    print("jojo spawned")
+    file = open("furry_names.txt")
+    lines = file.readlines()
+    name = lines[randint(1, 100)].strip()
+    enemy = Furry(name)
+    print(f"{name} spawned")
 
 
 hero = Hero(input(f"What's your name? "))
