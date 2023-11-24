@@ -9,11 +9,13 @@ class Furry:
         self.attributes = Attributes()
 
     def attack(self, hero):
-        hero.stats.health = hero.stats.health - self.stats.strength
+        if hero.attributes.defending:
+            hero.stats.health = round(hero.stats.health - 0.4 * self.stats.strength, 2)
+            hero.attributes.defending = False
+        else:
+            hero.stats.health -= self.stats.strength
         if hero.stats.health <= 0:
             print("FUCK!! A furry just killed you!")
             quit()
         print(f"Furry {self.name} attacked you for {self.stats.strength} \nAnd you have {hero.stats.health} left")
 
-    def die(self):
-        return None
