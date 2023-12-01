@@ -8,14 +8,15 @@ class Furry:
         self.stats = Stats(10, 10, 2)
         self.attributes = Attributes()
 
-    def attack(self, hero):
+    def attack(self, game, session):
+        hero = session.hero
         if hero.attributes.defending:
             hero.stats.health = round(hero.stats.health - 0.4 * self.stats.strength, 2)
             hero.attributes.defending = False
         else:
             hero.stats.health -= self.stats.strength
         if hero.stats.health <= 0:
-            print("FUCK!! A furry just killed you!")
+            game.send("FUCK!! A furry just killed you!")
             quit()
-        print(f"Furry {self.name} attacked you for {self.stats.strength} \nAnd you have {hero.stats.health} left")
+        game.send(f"Furry {self.name} attacked you for {self.stats.strength} \nAnd you have {hero.stats.health} left")
 

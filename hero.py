@@ -5,33 +5,36 @@ from stats import Stats, Attributes
 class Hero:
 
     class Action:
-        def __init__(self, name, shortname, method) -> None:
+        def __init__(self, name, shortname, method, level=1) -> None:
             self.name = name
             self.shortname = shortname
             self.method = method
+            self.unlocked_at = level
 
     def __init__(self, name):
         self.level = 1
+        self.experience = 0
+        self.experience_to_next_level = 10
         self.name = name
         self.weapon = None
-        self.actions = []
-        self.actions.extend([self.Action("damage", "d", self.action_damage),
-                            self.Action("defend", "de", self.action_defend),
-                            self.Action("shop", "s", self.action_shop),
-                            self.Action("rest", "r", self.action_rest)])
+        self.actions = [self.Action("damage", "d", self.action_damage),
+                        self.Action("defend", "de", self.action_defend, 2),
+                        self.Action("shop", "s", self.action_shop),
+                        self.Action("rest", "r", self.action_rest)]
         self.avail_actions = []
         self.stats = Stats(20, 20, 3)
         self.attributes = Attributes()
 
 
-    def take_action(self, game):
-        action = input(f"Choose your preferred action ({', '.join([act.name for act in self.avail_actions])}) ")
+    def take_action(self, game, session, action):        
         action.lower()
+
         for i_act in self.avail_actions:
             if action == i_act.name or action == i_act.shortname:
-                return i_act.method(game)
-        print("Invalid action")
-        self.take_action(game)
+                return i_act.method(game, session)
+
+        game.send("Invalid action")
+        return True
 
 
     def actions_get(self, name):
@@ -40,21 +43,34 @@ class Hero:
                 return i_act
 
 
-    def action_damage(self, game):
-        furry = game.enemy
-        furry.stats.health -= self.stats.strength #- self.weapon.strength
-        print(f"You attacked the furry {furry.name} for {self.stats.strength} \nNow they have {furry.stats.health} health")
-        if furry.stats.health <= 0:
-            print("What a skilled hero, you are. You killed a furry.")
-            self.avail_actions.remove(self.actions_get("damage"))
-            self.avail_actions.remove(self.actions_get("defend"))
-            game.kill_furry()
-        return 
-        
+    def remove_actions(self, list):
+        for action_name in list:
+            action = self.actions_get(action_name)
+            if action in self.avail_actions:
+                self.avail_actions.remove(action)
 
-    def action_defend(self, game):
+    def set_actions(self, list):
+        for action_name in list:
+            action = self.actions_get(action_name)
+            if action.unlocked_at <= self.level:
+                self.avail_actions.append(action)
+
+
+    def action_damage(self, game, session):
+        furry = session.enemy
+        furry.stats.health -= self.stats.strength #- self.weapon.strength
+        game.send(f"You attacked the furry {furry.name} for {self.stats.strength} \nNow they have {furry.stats.health} health")
+        if furry.stats.health <= 0:
+            game.send("What a skilled hero, you are. You killed a furry.")
+            self.remove_actions(["damage", "defend"])
+            session.kill_furry()
+            self.gain_experience(2, game)
+        return False
+
+
+    def action_defend(self, game, session):
         self.attributes.defending = True
-        return 
+        return False
 
     def action_flee(self):
         pass
@@ -63,15 +79,23 @@ class Hero:
         # will be looting and fing furry as a victory reward
         pass
 
-    def action_shop(self, game):
-        self.weapon = weapon = game.weapon
-        print(f"Succesfully bought {weapon.name}")
-        self.avail_actions.remove(self.actions_get("shop"))
-        return weapon
+    def action_shop(self, game, session):
+        self.weapon = weapon = session.weapon
+        game.send(f"Succesfully bought {weapon.name}")
+        self.remove_actions(["shop"])        
+        return False
 
-    def action_rest(self, game):
+    def action_rest(self, game, session):
         pack = randint(1, 5)
         self.stats.health += pack
-        print(f"You rested for {pack}")
-        self.avail_actions.remove(self.actions_get("rest"))
-        return
+        game.send(f"You rested for {pack}")
+        self.remove_actions(["rest"]) 
+        return False
+
+    def gain_experience(self, amount, game):
+        self.experience += amount
+        if self.experience >= self.experience_to_next_level:
+            self.level += 1
+            game.send(f"Leveled up to {self.level}")
+            self.experience -= self.experience_to_next_level
+            self.experience_to_next_level = round (1.5 * self.experience_to_next_level)
