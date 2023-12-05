@@ -48,8 +48,8 @@ class EventHandler:
         for event in self.active_events:
             chance -= event.chance
             if chance <= 0:
-                return_event = (event.type, event.method(game, session))
                 session.hero.set_actions(event.actions)
+                return_event = (event.type, event.method(game, session))
                 chance = 1000
                 self.change_chance(event.type, 1)
             else:
@@ -60,20 +60,19 @@ class EventHandler:
 
 def spawn_furry(game, session):
 
-    file = open("furry_names.txt")
+    file = open("game_src/furry_names.txt")
     lines = file.readlines()
-    name = lines[randint(1, 100)].strip()
+    name = lines[randint(1, 99)].strip()
     enemy = Furry(name)
-    game.send(f"{name} spawned")
+    game.send(f"furry_spawn%{', '.join([act.name for act in session.hero.avail_actions])}%{name}")
     session.enemy = enemy
 
 def spawn_merchant(game, session):
 
     weapon = get_random_weapon()    
-    game.send("You found a wandering merchant")
+    game.send(f"merchant%{', '.join([act.name for act in session.hero.avail_actions])}")
     session.weapon = weapon
 
 def visit_inn(game, session):
 
-    game.send("You walk by an inn")
-    return 1
+    game.send(f"inn_walk%{', '.join([act.name for act in session.hero.avail_actions])}")

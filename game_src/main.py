@@ -1,7 +1,7 @@
 from random import randint, random
 import socket
-import threading
 from _thread import *
+import time
 
 from hero import Hero
 from event_handler import EventHandler
@@ -61,6 +61,7 @@ while not shutdown:
     response = game.client_socket.recv(1024).decode('utf-8')
     try:
         session = game.sessions[response.split("%")[0]]
+        response = response.lower()
     except:
         print("No session yet")
     response = response.split("%")[1]
@@ -70,8 +71,8 @@ while not shutdown:
         session.initiate_handler()
 
         game.send(f"Your name is {session.hero.name}")
+        time.sleep(0.2)
         session.current_event = session.handler.roll_event(game, session)
-        game.send(f"Choose your preferred action ({', '.join([act.name for act in session.hero.avail_actions])}) ")
 
     elif response == "terminate":
         shutdown = True
@@ -90,13 +91,14 @@ while not shutdown:
 
     elif session.hero is not None:
         invalid = session.hero.take_action(game, session, response)
+        time.sleep(0.2)
 
         if not invalid and not session.enemy == None:
             session.enemy.attack(game, session)
         if not invalid and not session.enemy:
             session.current_event = session.handler.roll_event(game, session)
 
-        game.send(f"Choose your preferred action ({', '.join([act.name for act in session.hero.avail_actions])}) ")
+        
 
     else:
         print(f"Unsuccessfuly handled response was {response}")

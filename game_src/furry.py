@@ -18,5 +18,5 @@ class Furry:
         if hero.stats.health <= 0:
             game.send("FUCK!! A furry just killed you!")
             quit()
-        game.send(f"Furry {self.name} attacked you for {self.stats.strength} \nAnd you have {hero.stats.health} left")
+        game.send(f"furry_attack%{self.name}%{self.stats.strength}%{self.stats.health}/{self.stats.max_health}%{hero.stats.health}/{hero.stats.max_health}%{', '.join([act.name for act in hero.avail_actions])}")
 

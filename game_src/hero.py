@@ -26,8 +26,7 @@ class Hero:
         self.attributes = Attributes()
 
 
-    def take_action(self, game, session, action):        
-        action.lower()
+    def take_action(self, game, session, action):   
 
         for i_act in self.avail_actions:
             if action == i_act.name or action == i_act.shortname:
@@ -58,10 +57,9 @@ class Hero:
 
     def action_damage(self, game, session):
         furry = session.enemy
-        furry.stats.health -= self.stats.strength #- self.weapon.strength
-        game.send(f"You attacked the furry {furry.name} for {self.stats.strength} \nNow they have {furry.stats.health} health")
+        furry.stats.health -= self.stats.strength #- self.weapon.strength game.send(f"You attacked the furry {furry.name} for {self.stats.strength} \nNow they have {furry.stats.health} health")
         if furry.stats.health <= 0:
-            game.send("What a skilled hero, you are. You killed a furry.")
+            game.send(f"furry_kill")
             self.remove_actions(["damage", "defend"])
             session.kill_furry()
             self.gain_experience(2, game)
@@ -81,14 +79,14 @@ class Hero:
 
     def action_shop(self, game, session):
         self.weapon = weapon = session.weapon
-        game.send(f"Succesfully bought {weapon.name}")
+        game.send(f"purchase%{weapon.name}")
         self.remove_actions(["shop"])        
         return False
 
     def action_rest(self, game, session):
         pack = randint(1, 5)
         self.stats.health += pack
-        game.send(f"You rested for {pack}")
+        game.send(f"rest%{pack}")
         self.remove_actions(["rest"]) 
         return False
 
