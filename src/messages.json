@@ -1,0 +1,58 @@
+{
+    "furry_spawn": 
+    {
+        "title": "You're under attack",
+        "color": 14483463,
+        "description": "Your virginity is at a risk! Defeat the the $data1!",
+        "append_actions": true
+    },
+    "merchant1": 
+    {
+        "title": "You encountered a merchant.",
+        "color": 14682289,
+        "description": "And he has a secret offer, which can not be denied.",
+        "append_actions": true
+    },
+    "merchant2": 
+    {
+        "title": "You encountered a merchant.",
+        "color": 14682289,
+        "description": "You encountered a merchant and he has a crazy offer for $data1.",
+        "append_actions": true
+    },
+    "inn_walk": 
+    {
+        "title": "You encountered a cozy little inn.",
+        "color": 14869041,
+        "description": "You wallked by an inn and feel a bit weary.",
+        "append_actions": true
+    },
+    "furry_kill": 
+    {
+        "title": "A little time for a victory!",
+        "color": 8490735,
+        "description": "You completely abused the Furry, till he unalived!",
+        "append_actions": false
+    },
+    "rest": 
+    {
+        "title": "A good nap!",
+        "color": 437513,
+        "description": "You rested well and healed for $data1",
+        "append_actions": false
+    },
+    "purchase": 
+    {
+        "title": "A tremendous purchase!",
+        "color": 437513,
+        "description": "You successfully bought $data1 and it has become your new weapon of choice!",
+        "append_actions": false
+    },
+    "tech_tree": 
+    {
+        "title": "The tree of technologies",
+        "color": 8388736,
+        "description": "You have currently $data1 skill points available!",
+        "append_actions": false
+    }
+}

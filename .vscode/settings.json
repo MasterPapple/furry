@@ -1,0 +1,6 @@
+{
+    "python.analysis.extraPaths": [
+        "./game_src",
+        "./tech_images"
+    ]
+}

@@ -2,9 +2,11 @@ from random import randint, random
 import socket
 from _thread import *
 import time
+import json
 
 from hero import Hero
 from event_handler import EventHandler
+from tech_tree import TechTree
 
 print(f"-=== Welcome to the League of Furries ===-")
 print(f"Your task is simple. Kill them all!")
@@ -52,6 +54,7 @@ class Game:
 
 
 game = Game()
+tech_tree_gen = TechTree()
 game.initiate_connection()
 
 
@@ -63,6 +66,7 @@ while not shutdown:
         session = game.sessions[response.split("%")[0]]
         response = response.lower()
     except:
+        session = None
         print("No session yet")
     response = response.split("%")[1]
 
@@ -81,7 +85,7 @@ while not shutdown:
         game.send(f"Choose your preferred action ({', '.join([act.name for act in session.hero.avail_actions])}) ")
 
     elif response == "help":
-        game.send("Available commands are **start, terminate, actions, help**")
+        game.send("Available commands are **start, terminate, actions, help, techtree**")
 
     elif response == "amirite":
         game.send("yes you're completely right. Loen is total bitch useless whore, who cant even fuck an ant")
@@ -89,7 +93,28 @@ while not shutdown:
     elif response == "furry":
         game.send("Display furry")
 
-    elif session.hero is not None:
+    elif response == "inventory":
+        pass
+
+    elif response == "techtree" or response == "tt":
+        tech_tree_gen.render(session)
+        game.send(f"tech_tree%{session.hero.skill_points}")
+
+    elif response == "skill":
+        game.send("Upgradable skills are knowledge, shop, attack. Use as '>skill attack'!")
+
+    elif response.split(' ')[0] == "skill":
+        session.hero.upgrade_skill(response.split(' ')[1], game)
+
+    elif response == "levelup" or response.split(' ')[0] == "levelup":
+        if response == "levelup":
+            level = 1
+        else:
+            level = int(response.split(' ')[1])
+        session.hero.level += level
+        session.hero.skill_points += level
+
+    elif session is not None and session.hero is not None:
         invalid = session.hero.take_action(game, session, response)
         time.sleep(0.2)
 

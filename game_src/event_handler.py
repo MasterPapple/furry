@@ -64,13 +64,16 @@ def spawn_furry(game, session):
     lines = file.readlines()
     name = lines[randint(1, 99)].strip()
     enemy = Furry(name)
-    game.send(f"furry_spawn%{', '.join([act.name for act in session.hero.avail_actions])}%{name}")
+    game.send(f"furry_spawn%{name}%{enemy.image_path}%{', '.join([act.name for act in session.hero.avail_actions])}")
     session.enemy = enemy
 
 def spawn_merchant(game, session):
 
-    weapon = get_random_weapon()    
-    game.send(f"merchant%{', '.join([act.name for act in session.hero.avail_actions])}")
+    weapon = get_random_weapon()
+    if session.hero.techtree[2].level > 0:
+        game.send(f"merchant2%{weapon.name}%{', '.join([act.name for act in session.hero.avail_actions])}")
+    else:
+        game.send(f"merchant1%{', '.join([act.name for act in session.hero.avail_actions])}")
     session.weapon = weapon
 
 def visit_inn(game, session):

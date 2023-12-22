@@ -8,10 +8,10 @@ class Weapon:
 
 
 weapons = [
-    Weapon('Silver Knife', 8, 3),
-    Weapon('Sword', 15, 15),
-    Weapon('Big Axe', 20, 6),
-    Weapon('Long Spear', 18, 8)
+    Weapon('Silver Knife', 8, 0),
+    Weapon('Sword', 15, 0),
+    Weapon('Big Axe', 20, 0),
+    Weapon('Long Spear', 18, 0)
 ]
 
 def get_random_weapon():

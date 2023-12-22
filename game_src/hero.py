@@ -11,8 +11,15 @@ class Hero:
             self.method = method
             self.unlocked_at = level
 
+    class Tech:
+        def __init__(self, name, shortname) -> None:
+            self.name = name
+            self.shortname = shortname
+            self.level = 0
+
     def __init__(self, name):
         self.level = 1
+        self.skill_points = 0
         self.experience = 0
         self.experience_to_next_level = 10
         self.name = name
@@ -24,7 +31,11 @@ class Hero:
         self.avail_actions = []
         self.stats = Stats(20, 20, 3)
         self.attributes = Attributes()
-
+        self.techtree = [self.Tech("knowledge", "k"), 
+                         self.Tech("attack", "a"), 
+                         self.Tech("shop", "s")]
+        self.inventory = []
+        self.i_capacity = 0
 
     def take_action(self, game, session, action):   
 
@@ -94,6 +105,38 @@ class Hero:
         self.experience += amount
         if self.experience >= self.experience_to_next_level:
             self.level += 1
-            game.send(f"Leveled up to {self.level}")
+            self.skill_points += 1
+            game.send(f"Leveled up to {self.level} and gained a skill point")
             self.experience -= self.experience_to_next_level
             self.experience_to_next_level = round (1.5 * self.experience_to_next_level)
+
+    def upgrade_skill(self, skill, game):
+
+        if self.skill_points <= 0:
+            game.send("You don't have sufficient amount of skill points available!")
+            return
+
+        for branch in self.techtree:
+            if skill == branch.name or skill == branch.shortname:
+                branch.level += 1
+                self.skill_points -= 1
+                self.upgrade_changes(branch.name, branch.level)
+                game.send(f"Upgraded {branch.name} to level {branch.level}")
+                return
+            
+        game.send("Invalid skill")
+        return
+    
+    def upgrade_changes(self, skill, level):
+        if skill == "shop" and level == 2:
+            self.i_capacity += 1
+
+    def add_weapon(self, weapon, game):
+        if self.weapon == None:
+            self.weapon = weapon
+            game.send("The purchased weapon has been equipped.")
+        elif len(self.inventory) < self.i_capacity:
+            self.inventory.append(weapon)
+            game.send("The purchased weapon has been put into your inventory.")
+        else:
+            game.send("You have no free inventory capacity. Type 'c' to discard currently bought item or type 'w' or the number of your inventory slot to replace your current item.")

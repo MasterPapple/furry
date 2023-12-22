@@ -1,6 +1,6 @@
 {
     "title": "You are under attack!",
-    "description": "Your virginity is at risk! Defeat the furry attacker to protect your holiness and aid the siege on the Furry Kingdom!",
+    "description": "Your virginity is at risk! Defeat the furry attacker $name to protect your holiness and aid the siege on the Furry Kingdom!",
     "color": 12393757,
     "fields": [
     {
@@ -31,6 +31,6 @@
     "text": "Retaliate! Hint: Use actions such as $actions!"
     },
     "thumbnail": {
-    "url": "https://cdna.artstation.com/p/assets/images/images/045/709/822/large/lazaro-william-vieira-vague.jpg?1643332373"
+    "url": "$url"
     }
 }
