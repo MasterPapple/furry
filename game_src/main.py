@@ -32,7 +32,7 @@ class Game:
 
     def initiate_connection(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind(('192.168.1.27', 8080))
+        self.server_socket.bind(('192.168.1.25', 8080))
         self.server_socket.listen(1)
         print(f"Server listening now")
 
@@ -47,9 +47,22 @@ class Game:
         self.sessions[resp_list[1]] = self.Session(resp_list[0])
         return self.sessions[resp_list[1]]
 
-
     def send(self, message):
         game.client_socket.send(str.encode(message))
+
+    def save(self):
+        primitives = (bool, str, int, float, type(None))
+        hero_collect = {}
+        for session in self.sessions.values():
+            for attribute in session.hero.__dict__:
+                if isinstance(attribute, primitives):
+                    hero_collect[attribute] = session.hero.__dict__[attribute]
+
+        print(hero_collect)
+
+
+    def load(self):
+        pass
 
 
 
@@ -70,6 +83,7 @@ while not shutdown:
         print("No session yet")
     response = response.split("%")[1]
 
+
     if response == "start":
         session = game.start_session()
         session.initiate_handler()
@@ -79,51 +93,50 @@ while not shutdown:
         session.current_event = session.handler.roll_event(game, session)
 
     elif response == "terminate":
+        game.save()
         shutdown = True
 
-    elif response == "actions":
-        game.send(f"Choose your preferred action ({', '.join([act.name for act in session.hero.avail_actions])}) ")
-
     elif response == "help":
-        game.send("Available commands are **start, terminate, actions, help, techtree**")
+        game.send("help")
 
     elif response == "amirite":
         game.send("yes you're completely right. Loen is total bitch useless whore, who cant even fuck an ant")
-
-    elif response == "furry":
-        game.send("Display furry")
-
-    elif response == "inventory":
-        pass
-
-    elif response == "techtree" or response == "tt":
-        tech_tree_gen.render(session)
-        game.send(f"tech_tree%{session.hero.skill_points}")
-
-    elif response == "skill":
-        game.send("Upgradable skills are knowledge, shop, attack. Use as '>skill attack'!")
-
-    elif response.split(' ')[0] == "skill":
-        session.hero.upgrade_skill(response.split(' ')[1], game)
-
-    elif response == "levelup" or response.split(' ')[0] == "levelup":
-        if response == "levelup":
-            level = 1
-        else:
-            level = int(response.split(' ')[1])
-        session.hero.level += level
-        session.hero.skill_points += level
-
-    elif session is not None and session.hero is not None:
-        invalid = session.hero.take_action(game, session, response)
-        time.sleep(0.2)
-
-        if not invalid and not session.enemy == None:
-            session.enemy.attack(game, session)
-        if not invalid and not session.enemy:
-            session.current_event = session.handler.roll_event(game, session)
-
         
+
+    elif session is not None:
+
+        if response == "inventory":
+            game.send(f"inventory%{', '.join([item.name for item in session.hero.inventory])}") #finish
+
+        elif response == "actions":
+            game.send(f"actions%{', '.join([act.name for act in session.hero.avail_actions])}")
+
+        elif response == "techtree" or response == "tt":
+            tech_tree_gen.render(session)
+            game.send(f"tech_tree%{session.hero.skill_points}")
+
+        elif response == "skill":
+            game.send("skill")
+
+        elif response.split(' ')[0] == "skill":
+            session.hero.upgrade_skill(response.split(' ')[1], game)
+
+        elif response == "levelup" or response.split(' ')[0] == "levelup":
+            if response == "levelup":
+                level = 1
+            else:
+                level = int(response.split(' ')[1])
+            session.hero.level += level
+            session.hero.skill_points += level
+
+        elif session is not None and session.hero is not None:
+            output = session.hero.take_action(game, session, response)
+            time.sleep(0.2)
+
+            if not output and not session.enemy == None:
+                session.enemy.attack(game, session)
+            if not output and not session.enemy:
+                session.current_event = session.handler.roll_event(game, session)
 
     else:
         print(f"Unsuccessfuly handled response was {response}")

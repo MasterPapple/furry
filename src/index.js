@@ -16,6 +16,7 @@ const client = new Client({
 });
 
 var current_channel = null;
+var current_user = null
 var image_list = {};
 var messages_list = JSON.parse(fs.readFileSync("src/messages.json"))
 
@@ -23,17 +24,18 @@ client.on('ready', (c) => {
     console.log(`${c.user.tag} is online`)
 });
 
-var receive_prefixless = false;
+var receive_prefixless = [];
 
 client.on('messageCreate', (message) => {
     if (message.author.id === client.user.id) return;
     if (message.content.startsWith('>')) {
         current_channel = message.channel;
+        current_user = message.author.id
         connection.write(`${message.author.id}%${message.content.slice(1)}`);
     }
-    if (receive_prefixless) {
+    if (receive_prefixless.includes(message.author.id)) {
         connection.write(`${message.content}%${message.author.id}`);
-        receive_prefixless = false;
+        receive_prefixless = receive_prefixless.filter(e => e !== message.author.id);
     }
 });
 
@@ -42,17 +44,18 @@ client.login(process.env.TOKEN);
 
 const connection = new net.Socket();
 
-connection.connect(8080, '192.168.1.27', () => {
+connection.connect(8080, '192.168.1.25', () => {
     console.log(`Connected to python server`);
 });
 
 connection.on('data', (data) => {
     if (current_channel == null) return;
-    if (`${data}` == "What's your name?") {
-        receive_prefixless = true;
-    }
-    console.log(data.toString())
     const split_data = data.toString().split("%");
+
+    if (`${data}` == "What's your name?" || split_data[0] == 'purchase3') {
+        receive_prefixless.push(current_user); //temporary, later speak between sockets via user id at all times
+    }
+
     if (split_data[0] == "furry_attack") {
 
         var furryEmbedString = fs.readFileSync("src/fight.json").toString();   
@@ -114,8 +117,6 @@ function embedBuilding(task, data_list) {
     var embed_helper = JSON.stringify(messages_list[task])
     for (element in data_list) {
         var data_string = '$data' + element.toString()
-        console.log(data_string)
-        console.log(data_list[element])
         embed_helper = embed_helper.replaceAll(data_string, data_list[element])
     }
     embed_helper = JSON.parse(embed_helper)

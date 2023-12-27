@@ -41,18 +41,81 @@
         "description": "You rested well and healed for $data1",
         "append_actions": false
     },
-    "purchase": 
+    "purchase1": 
     {
         "title": "A tremendous purchase!",
         "color": 437513,
         "description": "You successfully bought $data1 and it has become your new weapon of choice!",
         "append_actions": false
     },
+    "purchase2": 
+    {
+        "title": "A tremendous purchase!",
+        "color": 437513,
+        "description": "You successfully bought $data1 and it has been put into your inventory.",
+        "append_actions": false
+    },
+    "purchase3": 
+    {
+        "title": "A tremendous purchase! And a dilemma.",
+        "color": 437513,
+        "description": "You successfully bought $data1. You have no free inventory capacity. Type 'c' to discard currently bought item or type 'w' or the number of your inventory slot to replace your current item.",
+        "append_actions": false
+    },
     "tech_tree": 
     {
         "title": "The tree of technologies",
         "color": 8388736,
-        "description": "You have currently $data1 skill points available!",
+        "description": "You have currently $data1 skill points available! \nUse '>skill {skill_name}' to upgrade a skill",
+        "append_actions": false
+    },
+    "flee1": 
+    {
+        "title": "The escape",
+        "color": 437513,
+        "description": "You have succesfully ran away from the furry. The furry seems uninterested in your flesh.",
+        "append_actions": false
+    },
+    "flee2": 
+    {
+        "title": "Oh, so you tried to escape?!",
+        "color": 14483463,
+        "description": "The furry just grabbed hold of your left foot and pulled you back. There's nothing else you can do now... MAN UP! AND FIGHT!",
+        "append_actions": false
+    },
+    "death": 
+    {
+        "title": "Fuck, a furry just fisted you to unconsciousness.",
+        "color": 14483463,
+        "description": "You wake up couple of days later, somewhere far in the woods. You vaguely remember what happened that night, it feels suspicious. You lost the weapon you were using and your experience decreased.",
+        "append_actions": false
+    },
+    "help": 
+    {
+        "title": "Help centre.",
+        "color": 1048560,
+        "description": "Available commands are:\n**start**\n**terminate**\n**help**\nCommands useable after initiation by **start** include:\n**inventory**\n**actions**\n**techtree**\n**skill**",
+        "append_actions": false
+    },
+    "actions": 
+    {
+        "title": "Available actions.",
+        "color": 1048560,
+        "description": "Choose your preferred action ($data1)",
+        "append_actions": false
+    },
+    "skill": 
+    {
+        "title": "Available skills.",
+        "color": 1048560,
+        "description": "Upgradable skills are knowledge, shop, attack. Use as '>skill attack'!",
+        "append_actions": false
+    },
+    "inventory": 
+    {
+        "title": "Inventory items",
+        "color": 1048560,
+        "description": "Items in your inventory:\n$data1",
         "append_actions": false
     }
 }

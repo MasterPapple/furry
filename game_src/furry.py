@@ -30,8 +30,9 @@ class Furry:
         else:
             hero.stats.health -= self.stats.strength
         if hero.stats.health <= 0:
-            game.send("FUCK!! A furry just killed you!")
-            quit()
+            hero.weapon.decrease_durability(hero) #add deleveling and losing skills proportionatelly
+            game.send(f"death")
+            return
         messagestring = f"furry_attack%{self.name}%{self.stats.strength}%{self.stats.health}/{self.stats.max_health}"
         messagestring = messagestring + f"%{hero.stats.health}/{hero.stats.max_health}%{', '.join([act.name for act in hero.avail_actions])}"
         messagestring = messagestring + f"%{hero.stats.strength}"

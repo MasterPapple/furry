@@ -15,7 +15,7 @@ class EventHandler:
     def __init__(self, game) -> None:
 
         self.all_events = []
-        self.all_events.append(self.Event("furry_spawn", 1, spawn_furry, ["damage", "defend"]))
+        self.all_events.append(self.Event("furry_spawn", 1, spawn_furry, ["damage", "defend", "flee"]))
         self.all_events.append(self.Event("merchant_spawn", 1, spawn_merchant, ["shop"]))
         self.all_events.append(self.Event("inn_visit", 1, visit_inn, ["rest"]))
 
@@ -53,7 +53,7 @@ class EventHandler:
                 chance = 1000
                 self.change_chance(event.type, 1)
             else:
-                self.change_chance(event.type, event.chance + 1)
+                self.change_chance(event.type, event.chance + 2)
 
         return return_event
 

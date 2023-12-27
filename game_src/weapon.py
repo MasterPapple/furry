@@ -1,22 +1,29 @@
 from random import randint
+import copy
 
 class Weapon:
-    def __init__(self, name, attack_power, defense_power):
+    def __init__(self, name, attack_power, defense_power, durability):
         self.name = name
         self.attack_power = attack_power
         self.defense_power = defense_power
+        self.durability = durability
+
+    def decrease_durability(self, hero, amount=1):
+        self.durability -= amount
+        if self.durability <= 0:
+            hero.weapon = None
 
 
 weapons = [
-    Weapon('Silver Knife', 8, 0),
-    Weapon('Sword', 15, 0),
-    Weapon('Big Axe', 20, 0),
-    Weapon('Long Spear', 18, 0)
+    Weapon('Silver Knife', 2, 0, 1),
+    Weapon('Sword', 3, 0, 2),
+    Weapon('Big Axe', 4, 0, 1),
+    Weapon('Long Spear', 3, 0, 1)
 ]
 
 def get_random_weapon():
     n = randint(1, len(weapons)) - 1
-    return weapons[n]
+    return copy.deepcopy(weapons[n])
 
 
 """class Warrior:

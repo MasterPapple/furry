@@ -27,7 +27,8 @@ class Hero:
         self.actions = [self.Action("damage", "d", self.action_damage),
                         self.Action("defend", "de", self.action_defend, 2),
                         self.Action("shop", "s", self.action_shop),
-                        self.Action("rest", "r", self.action_rest)]
+                        self.Action("rest", "r", self.action_rest),
+                        self.Action("flee", "f", self.action_flee, 3)]
         self.avail_actions = []
         self.stats = Stats(20, 20, 3)
         self.attributes = Attributes()
@@ -68,10 +69,13 @@ class Hero:
 
     def action_damage(self, game, session):
         furry = session.enemy
-        furry.stats.health -= self.stats.strength #- self.weapon.strength game.send(f"You attacked the furry {furry.name} for {self.stats.strength} \nNow they have {furry.stats.health} health")
+        if self.weapon is not None:
+            furry.stats.health -= self.stats.strength + self.weapon.attack_power
+        else: 
+            furry.stats.health -= self.stats.strength
         if furry.stats.health <= 0:
             game.send(f"furry_kill")
-            self.remove_actions(["damage", "defend"])
+            self.remove_actions(["damage", "defend", "flee"])
             session.kill_furry()
             self.gain_experience(2, game)
         return False
@@ -81,22 +85,30 @@ class Hero:
         self.attributes.defending = True
         return False
 
-    def action_flee(self):
-        pass
+    def action_flee(self, game, session):
+        randno = randint(1, 2)
+        if randno == 1:
+            session.enemy = None
+            game.send(f"flee1")
+            return False
+        elif randno == 2:
+            game.send(f"flee2")
+            return False
 
     def action_victory_dance(self):
         # will be looting and fing furry as a victory reward
         pass
 
     def action_shop(self, game, session):
-        self.weapon = weapon = session.weapon
-        game.send(f"purchase%{weapon.name}")
+        value = self.add_weapon(session.weapon, game)
         self.remove_actions(["shop"])        
-        return False
+        return value
 
     def action_rest(self, game, session):
         pack = randint(1, 5)
         self.stats.health += pack
+        if self.stats.health > self.stats.max_health:
+            self.stats.health = self.stats.max_health
         game.send(f"rest%{pack}")
         self.remove_actions(["rest"]) 
         return False
@@ -134,9 +146,22 @@ class Hero:
     def add_weapon(self, weapon, game):
         if self.weapon == None:
             self.weapon = weapon
-            game.send("The purchased weapon has been equipped.")
+            game.send(f"purchase1%{weapon.name}")
         elif len(self.inventory) < self.i_capacity:
             self.inventory.append(weapon)
-            game.send("The purchased weapon has been put into your inventory.")
+            game.send(f"purchase2%{weapon.name}")
         else:
-            game.send("You have no free inventory capacity. Type 'c' to discard currently bought item or type 'w' or the number of your inventory slot to replace your current item.")
+            game.send(f"purchase3%{weapon.name}")
+            response = game.client_socket.recv(1024).decode('utf-8')
+            resp_list = response.split("%")
+            if resp_list[0] == 'c':
+                game.send("cancelled")
+                return
+            elif resp_list[0] == 'w':
+                game.send("weaponized")
+                self.weapon = weapon
+            elif resp_list[0].isdigit():
+                if int(resp_list[0]) <= self.i_capacity and int(resp_list[0]) >= 1:
+                    self.inventory[int(resp_list[0]) -1] = weapon
+                game.send("slotted")
+
